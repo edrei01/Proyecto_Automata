@@ -49,18 +49,29 @@ class AFD:
         return current_state in self.accept_states
     
 automata = AFD()
-
 def verificarCadena():
     input_string = entrada.get()
-    if automata.validar(input_string):
-        resultado.config(text=f"La Cadena es valida: {input_string}")
+    transiciones = []
+    current_state = automata.start_state
+    for symbol in input_string:
+        transiciones.append(f"{current_state} --({symbol})--> {automata.transitions[current_state].get(symbol)}")
+        next_state = automata.transitions[current_state].get(symbol)
+        if next_state is None:
+            break  # La cadena no es válida
+        current_state = next_state
+    
+    if current_state in automata.accept_states:
+        resultado.config(text=f"La Cadena es válida: {input_string}")
     else:
-        resultado.config(text=f"La Cadena no es valida: {input_string}")
+        resultado.config(text=f"La Cadena no es válida: {input_string}")
+    
+    transiciones_label.config(text='\n'.join(transiciones))
 
 ventana = tk.Tk()
 ventana.title("Automata Rangos")
-ventana.geometry("400x200")  
+ventana.geometry("400x400")  # Aumenté la altura de la ventana para dar espacio a las transiciones
 ventana.configure(bg="lightblue")  
+
 etiqueta = tk.Label(ventana, text="Ingrese una cadena:")
 etiqueta.pack()
 
@@ -73,6 +84,9 @@ boton.pack()
 resultado = tk.Label(ventana, text="")
 resultado.pack()
 
+# Etiqueta para mostrar las transiciones
+transiciones_label = tk.Label(ventana, text="", justify="left")
+transiciones_label.pack()
 
 # Ejecutar la ventana
 ventana.mainloop()
